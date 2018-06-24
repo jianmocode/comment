@@ -2,14 +2,14 @@
     "name": "comment",
     "org": "xpmsns",
     "version": "0.9.0",
-    "cname": "XpmSNS-美言",
+    "cname": "简墨美言",
     "image": {
         "color":"/static/icons/app-color.svg",
         "dark":"/static/icons/app-dark.svg",
         "light":"/static/icons/app-light.svg"
     },
     "icontype": "img",
-    "intro": "XpmSNS评论系统。包含评论、喜欢、讨厌、赞赏、评分、打赏等功能的评论系统。",
+    "intro": "简墨评论系统。包含评论、喜欢、讨厌、赞赏、评分、打赏等功能的评论系统。",
     "detail": "@readme.md",
     "document": "@document.md",
     "author": "北京云道天成科技有限公司",
