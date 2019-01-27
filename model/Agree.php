@@ -52,6 +52,259 @@ class Agree extends Model {
 	/**
 	 * 自定义函数 
 	 */
+    // @KEEP BEGIN
+    
+    /**
+     * 读取赞同内容
+     * @param array &$rows 赞同数据集合
+     * @param array $selects 选中字段清单
+     *                 [
+     *                    "origin"=>["field1","field2"..]
+     *                    ...
+     *                 ]
+     */
+    public function getSource( & $rows, $selects=[] ) {
+
+        // 处理图文
+        $article_ids = [];
+
+        foreach( $rows  as $idx=>$rs ){
+            if ( $rs["origin"] == "article" ){
+                array_push($article_ids, $rs["outer_id"]);
+            }
+        }
+
+        // 处理图文
+        if ( !empty($article_ids) ) {
+
+            $select = is_array($selects["article"]) ? $selects["article"] : [
+                "article.article_id",
+                "article.title","article.cover","article.summary", "article.author", 
+                "article.view_cnt","article.like_cnt", "article.dislike_cnt", "article.comment_cnt",
+            ];
+
+            $art = new \Xpmsns\Pages\Model\Article;
+            $articles = $art->getInByArticleId($article_ids, $select);
+
+            foreach( $rows as &$rs  ){
+                $article_id = $rs["outer_id"];
+                $article = $articles[$article_id];
+                if( !is_array($article) ) {
+                    $article = [];
+                }
+
+                $rs = array_merge( $rs, $article );
+            }
+        }
+    }
+
+
+    /**
+     * 赞同初始化( 注册行为/注册任务/设置默认值等... )
+     */
+    public function __defaults() {
+
+        // 注册任务
+        $tasks = [
+            [
+                "name"=>"赞同任务", "slug"=>"agree", "type"=>"repeatable",
+                "daily_limit"=>1, "process"=>3, "refresh"=>"daily",
+                "quantity" => [0,0,300],
+                "params" => [
+                    "count"=>3
+                ],
+                "auto_accept" => 0,
+                "accept" => ["class"=>"\\xpmsns\\comment\\model\\agree", "method"=>"onAgreeAccpet"],
+                "status" => "online",
+            ]
+        ];
+
+        // 注册行为
+        $behaviors =[
+            [
+                "name" => "用户赞同", "slug"=>"xpmsns/comment/agree/create",
+                "intro" =>  "本行为当用户赞同成功后触发",
+                "params" => ["agree_id"=>"赞同ID", "user_id"=>"用户ID", "outer_id"=>"资源ID", "origin"=>"来源", "url"=>"地址", "param"=>"参数", "origin_outer_id"=>"赞同唯一ID"],
+                "status" => "online",
+            ]
+        ];
+
+        // 订阅行为( 响应任务处理 )
+        $subscribers =[
+            [
+                "name" => "赞同任务",
+                "behavior_slug"=>"xpmsns/comment/agree/create",
+                "outer_id" => "agree",
+                "origin" => "task",
+                "timeout" => 30,
+                "handler" => ["class"=>"\\xpmsns\\comment\\model\\agree", "method"=>"onAgreeChange"],
+                "status" => "on",
+            ]
+        ];
+
+        $t = new \Xpmsns\User\Model\Task();
+        $b = new \Xpmsns\User\Model\Behavior();
+        $s = new \Xpmsns\User\Model\Subscriber();
+
+        foreach( $tasks as $task ){
+            try { $t->create($task); } catch( Excp $e) { $e->log(); }
+        }
+
+        foreach( $behaviors as $behavior ){
+            try { $b->create($behavior); } catch( Excp $e) { $e->log(); }
+        }
+        foreach( $subscribers as $subscriber ){
+            try { $s->create($subscriber); } catch( Excp $e) { $e->log(); }
+        }
+    }
+
+    /**
+     * 任务接受响应: 赞同任务 (验证是否符合接受条件)
+     * @return 符合返回 true, 不符合返回 false
+     */
+    public function onAgreeAccpet(){
+        return true;
+    }
+
+    /**
+     * 订阅器: 赞同任务 ( 赞同行为发生时, 触发此函数, 可在后台暂停或关闭)
+     * @param array $behavior  行为(用户签到)数据结构
+     * @param array $subscriber  订阅者(签到任务订阅) 数据结构  ["outer_id"=>"任务SLUG", "origin"=>"task" ... ]
+     * @param array $data  行为数据 ["agree_id"=>"赞同ID", "user_id"=>"用户ID", "outer_id"=>"资源ID", "origin"=>"来源", "url"=>"地址", "param"=>"参数", "origin_outer_id"=>"赞同唯一ID"],
+     * @param array $env 环境数据 (session_id, user_id, client_ip, time, user, cookies...)
+     */
+    public function onAgreeChange( $behavior, $subscriber, $data, $env ) {
+        
+        $task_slug = $subscriber["outer_id"];
+        $user_id = $env["user_id"];
+        $outer_id = $data["outer_id"];
+        $origin = $data["origin"];
+
+        $cache_name = "onAgreeChange:{$user_id}:{$origin}_{$outer_id}";
+        if (empty( $outer_id )) {
+            return;
+        }
+
+        if (empty( $user_id )) {
+            return;
+        }
+
+        $job = new Job(["name"=>"XpmsnsUserBehavior"]);
+        if ( $this->cache->get($cache_name) !== false ) {
+            $job->info("\t用户已赞同过本篇文章(user={$user_id} origin={$origin} outer_id={$outer_id})");
+            $job->info("\t当前步骤: 维持不变");
+            return;
+        }
+
+        // 缓存到第二日凌晨
+        $tomorrow = strtotime("+1d", time());
+        $tomorrow = strtotime(date("Y-m-d 00:00:00", $tomorrow));
+        $tls = $tomorrow-time();
+        $this->cache->set($cache_name, time(), $tls);
+        $job->info("\t标记为已赞同有效期至".date("Y-m-d 00:00:00", $tomorrow). " (user={$user_id} origin={$origin} outer_id={$outer_id} tls={$tls}");
+
+        $t = new \Xpmsns\User\Model\Usertask;
+        $task = $t->getByTaskSlugAndUserId( $task_slug, $user_id );
+        if ( empty($task) ) {
+            throw new Excp("未找到任务信息({$task_slug})", 404, ["task_slug"=>$task_slug, "user_id"=>$user_id]);
+        }
+
+        // 自动接受任务
+        $usertask = $task["usertask"];
+        if( 
+            $task["auto_accept"] == 1 &&
+            ( empty($usertask) || ( $usertask["status"] != "accepted" &&  $task["type"] == "repeatable" ) )
+        ) {
+            $task["usertask"] = $usertask = $t->acceptBySlug( $task_slug, $user_id );
+        }
+
+        if ( empty($task["usertask"]) ) {
+            throw new Excp("用户尚未接受该任务({$task_slug})", 404, ["task_slug"=>$task_slug, "user_id"=>$user_id]); 
+        }
+
+        // 扩展数量
+        $params = is_array($task["params"]) ? $task["params"] : [];
+        $params["count"] = empty($params["count"]) ?  intval($task["process"]) : intval($params["count"]);
+        if ( $params["count"] != intval($task["process"]) ) {
+            $tt = new  \Xpmsns\User\Model\Task;
+            $quantity = []; 
+            for( $i=0;$i<$params["count"]; $i++) {
+                $quantity[$i] = 0;
+            }
+            $quantity[$params["count"]-1] = end($task["quantity"]);
+
+            $tt->updateBy("task_id", [
+                "task_id"=>$task["task_id"],
+                "process" => $params["count"],
+                "quantity" => $quantity,
+            ]);
+        }
+
+
+        // 任务副本创建时间
+        if ( strtotime($data["created_at"]) < strtotime($usertask["created_at"]) ) {
+            $created_at = $data["created_at"];
+        } else {
+            $created_at = $usertask["created_at"];
+        }
+
+        // 当天的
+        $today = date("Y-m-d 00:00:00");
+
+        // 检索自任务副本创建到当前时刻的赞同数量
+        $process = $this->query()
+                   ->where("user_id", "=",$user_id)
+                   ->where("created_at", ">=",$today)
+                   ->count("agree_id")
+                ;
+        if ( intval($process) >  intval($params["count"]) ) {
+            $process = intval($params["count"]);
+        }
+
+        $job->info("\t当前步骤: process={$process} today={$today} user_id={$user_id} count={$params["count"]} ");
+
+        if ( $process > 0 ) {
+            $t->processByUsertaskId( $usertask["usertask_id"], $process );
+        }
+
+    }
+
+    /**
+     * 重载SaveBy
+     */
+    public function saveBy( $uniqueKey,  $data,  $keys=null , $select=["*"]) {
+        if ( !empty($data["origin"]) &&  !empty($data["outer_id"]) ) {
+            $data["origin_outer_id"] = "DB::RAW(CONCAT(`origin`,'_', `user_id`, '_', `outer_id`))";
+        }
+        return parent::saveBy( $uniqueKey,  $data,  $keys , $select );
+    }
+
+
+	/**
+	 * 重载Remove
+	 * @return [type] [description]
+	 */
+	function remove( $data_key, $uni_key="_id", $mark_only=true ){ 
+		
+		if ( $mark_only === true ) {
+
+			$time = date('Y-m-d H:i:s');
+			$_id = $this->getVar("_id", "WHERE {$uni_key}=? LIMIT 1", [$data_key]);
+			$row = $this->update( $_id, [
+				"deleted_at"=>$time, 
+				"origin_outer_id"=>"DB::RAW(CONCAT('_','".time() . rand(10000,99999). "_', `origin_outer_id`))"
+			]);
+
+			if ( $row['deleted_at'] == $time ) {	
+				return true;
+			}
+			return false;
+		}
+
+		return parent::remove($data_key, $uni_key, $mark_only);
+	}
+
+    // @KEEP END
 
 
 	/**
