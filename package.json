@@ -1,7 +1,7 @@
 {
     "name": "comment",
     "org": "xpmsns",
-    "version": "0.9.0",
+    "version": "1.0.0",
     "cname": "简墨美言",
     "image": {
         "color":"/static/icons/app-color.svg",
@@ -19,29 +19,6 @@
             "slug": "xpmsns/comment",
             "group": "美言"
         },{
-            "slug":"xpmsns/comment/comment/audit",
-            "name":"审核",
-            "index": true,
-            "icon":{
-                "default":"/static/icons/audit.svg"
-            },
-            "icontype": "img",
-            "linktype":"i",
-            "link":"{comment,audit}",
-            "permission": "boss,admin,manager,user",
-            "order":9999
-        },{
-            "slug":"xpmsns/comment/comment/index",
-            "name":"评论",
-            "icon":{
-                "default":"/static/icons/comment.svg"
-            },
-            "icontype": "img",
-            "linktype":"i",
-            "link":"{comment,index}",
-            "permission": "boss,admin,manager,user",
-            "order":9999
-        },{
             "slug":"xpmsns/comment/like/index",
             "name":"赞赏",
             "icon":{
@@ -52,53 +29,11 @@
             "link":"{like,index}",
             "permission": "boss,admin,manager,user",
             "order":9999
-        },{
-            "slug":"xpmsns/comment/dislike/index",
-            "name":"讨厌",
-            "icon":{
-                "default":"/static/icons/dislike.svg"
-            },
-            "icontype": "img",
-            "linktype":"i",
-            "link":"{dislike,index}",
-            "permission": "boss,admin,manager,user",
-            "order":9999
-        },{
-            "slug":"xpmsns/comment/reward/index",
-            "name":"打赏",
-            "icon":{
-                "default":"/static/icons/reward.svg"
-            },
-            "icontype": "img",
-            "linktype":"i",
-            "link":"{reward,index}",
-            "permission": "boss,admin,manager,user",
-            "order":9999
-        },{
-            "slug":"xpmsns/comment/rate/index",
-            "name":"评分",
-            "icon":{
-                "default":"/static/icons/rate.svg"
-            },
-            "icontype": "img",
-            "linktype":"i",
-            "link":"{rate,index}",
-            "permission": "boss,admin,manager,user",
-            "order":9999
-        },{
-            "slug":"xpmsns/comment/block/index",
-            "name":"屏蔽",
-            "icon":{
-                "default":"/static/icons/block.svg"
-            },
-            "icontype": "img",
-            "linktype":"i",
-            "link":"{block,index}",
-            "permission": "boss,admin,manager,user",
-            "order":9999
         }
     ],
-    "dependencies": [],
+    "dependencies": {
+        "xpmsns/user": "1.5.1~"
+    },
     "injections": [],
     "api": [],
     "register_api": [],
