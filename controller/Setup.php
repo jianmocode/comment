@@ -13,6 +13,7 @@ class SetupController extends \Xpmse\Loader\Controller {
 	function __construct() {
 
 		$this->models = [
+            '\\Xpmsns\\Comment\\Model\\Agree',
 		];
 	}
 

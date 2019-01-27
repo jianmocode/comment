@@ -19,14 +19,14 @@
             "slug": "xpmsns/comment",
             "group": "美言"
         },{
-            "slug":"xpmsns/comment/like/index",
-            "name":"赞赏",
+            "slug":"xpmsns/comment/agree/index",
+            "name":"赞同",
             "icon":{
-                "default":"/static/icons/like.svg"
+                "default":"/static/icons/agree.svg"
             },
             "icontype": "img",
             "linktype":"i",
-            "link":"{like,index}",
+            "link":"{agree,index}",
             "permission": "boss,admin,manager,user",
             "order":9999
         }
