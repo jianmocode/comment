@@ -670,7 +670,13 @@ class Agree extends Model {
 	function create( $data ) {
 		if ( empty($data["agree_id"]) ) { 
 			$data["agree_id"] = $this->genId();
-		}
+        }
+        
+        // @KEEP BEGIN
+        if ( !empty($data["origin"]) &&  !empty($data["outer_id"]) ) {
+            $data["origin_outer_id"] = "DB::RAW(CONCAT(`origin`,'_', `user_id`, '_', `outer_id`))";
+        }
+        // @KEEP END
 		return parent::create( $data );
 	}
 
