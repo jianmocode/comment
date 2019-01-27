@@ -47,6 +47,11 @@ class Agree extends Api {
         $time = time();
         $inst = new \Xpmsns\Comment\Model\Agree;
         $data["user_id"] = $user_id;
+
+        // 处理特别数据
+        if ( !empty($data["param"]) ) {
+            $data["param"] = Utils::json_decode($data["param"]);
+        }
         try {
             $resp =  $inst->create( $data );
         } catch( Excp $e ) {
@@ -88,7 +93,7 @@ class Agree extends Api {
         $inst = new \Xpmsns\Comment\Model\Agree;
         $agree_id = $data["agree_id"];
 
-        $agree = $fav->getByAgreeId($agree_id);
+        $agree = $inst->getByAgreeId($agree_id);
         if ( $agree["user_id"] != $user_id ) {
             throw new Excp("您没有该赞同的删除权限", 403, ["user_id"=>$user_id, "data"=>$data]);
         }
