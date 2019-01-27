@@ -4,78 +4,106 @@ use \Xpmse\Utils as Utils;
 use \Xpmse\Tuan as Tuan;
 use \Xpmse\Excp as Excp;
 use \Xpmse\Conf as Conf;
+use \Xpmse\Option as Option;
+use \Xpmse\Wechat as Wechat;
 
 
 class SetupController extends \Xpmse\Loader\Controller {
 	
-	
 	function __construct() {
 
 		$this->models = [
-			'\\Xpmsns\\Comment\\Model\\Pet', 
 		];
 	}
 
-	/**
-	 * 初始化默认数据
-	 * @return [type] [description]
-	 */
-	private function defaults_init() {
 
-		// 注册配置
-		$option = new \Xpmse\Option('Xpmsns/Comment');
-		$option->register("配置项一", "someoption/sample", [
-			"key" => "value",
-			"key" => ["k"=>"v"]
-		]);
+	/**
+	 * 初始化用户相关配置项
+	 * @return 
+	 */
+	private function init_option() {
+
+		// // 注册微信消息处理器
+		// Wechat::bind("xpmsns/user", "user/wechatRouter");
+
+		// $opt = new Option('xpmsns/message');
+
+		// // 短信验证码
+		// $sms_vcode = $opt->get("user/sms/vcode");
+		// if ( $sms_vcode === null ) {
+		// 	$opt->register(
+		// 		"短信验证码配置", 
+		// 		"user/sms/vcode", 
+		// 		[
+		// 			"type" => "qcloud",
+		// 			"option"=>[
+		// 				"appid" => "<your appid>",
+		// 				"appkey" => "<your appkey>",
+		// 				"sign" => "您的签名",
+		// 				"message" => "您的短信验证码为 {1} , 打死不要告诉别人！" 
+		// 			]
+		// 		],
+		// 		90
+		// 	);
+        // }
+    
 	}
 
 
-	/**
-	 * 应用安装脚本（ 创建数据表、初始化配置 
-	 * @return 
-	 */
+	private  function remove_option(){
+		$opt = new Option('xpmsns/message');
+		$opt->unregister();
+		// 解绑微信处理器
+		Wechat::unbind("xpmsns/message");
+	}
+
+	
+	private  function init_group() {
+		
+		$g = new \Xpmsns\User\Model\Group;
+		$default = $g->getBySlug('default');
+		if ( empty($default) ) {
+			$g->create(['slug'=>"default", 'name'=>'默认分组']);
+		}
+	}
+
+
 	function install() {
 
 		$models = $this->models;
 		$insts = [];
 		foreach ($models as $mod ) {
-			if ( !class_exists($mod) ) {
-				echo json_encode(['code'=>404, "message"=>"未找到应用模块($mod)"]);
-			}
-
 			try { $insts[$mod] = new $mod(); } catch( Excp $e) {echo $e->toJSON(); return;}
 		}
 		
 		foreach ($insts as $inst ) {
 			try { $inst->__clear(); } catch( Excp $e) {echo $e->toJSON(); return;}
-			try { $inst->__schema(); } catch( Excp $e) {echo $e->toJSON(); return;}
+            try { $inst->__schema(); } catch( Excp $e) {echo $e->toJSON(); return;}
+            try { $inst->__defaults(); } catch( Excp $e) { echo $e->toJSON(); return; }  // 加载默认数据
 		}
 
+		// 创建配置项
 		try {
-			$this->defaults_init();
-		}  catch ( Excp $e ) {
-			echo $e->toJSON();
-			return;
+			$this->init_option();
+		} catch( Excp $e ){
+			echo $e->toJSON(); return;
+		}
+
+		// 创建默认分组
+		try {
+			$this->init_group();
+		} catch( Excp $e ){
+			echo $e->toJSON(); return;
 		}
 
 		echo json_encode('ok');
 	}
 
 
-	/**
-	 * 应用升级脚本
-	 * @return [type] [description]
-	 */
 	function upgrade(){
 		echo json_encode('ok');	
 	}
 
-
-	/**
-	 * 应用修复脚本( 重建数据表
-	 * @return 
-	 */
 	function repair() {
 
 		$models = $this->models;
@@ -85,17 +113,29 @@ class SetupController extends \Xpmse\Loader\Controller {
 		}
 		
 		foreach ($insts as $inst ) {
-			try { $inst->__schema(); } catch( Excp $e) {echo $e->toJSON(); return;}
+            try { $inst->__schema(); } catch( Excp $e) {echo $e->toJSON(); return;}
+            try { $inst->__defaults(); } catch( Excp $e) { echo $e->toJSON(); return; }  // 加载默认数据
+		}
+
+		// 创建配置项
+		try {
+			$this->init_option();
+		} catch( Excp $e ){
+			echo $e->toJSON(); return;
+		}
+
+		// 创建默认分组
+		try {
+			$this->init_group();
+		} catch( Excp $e ){
+			echo $e->toJSON(); return;
 		}
 
 		echo json_encode('ok');		
 	}
 
 
-	/**
-	 * 卸载应用 ( 删除数据表， 删除配置项
-	 * @return 
-	 */
+	// 卸载
 	function uninstall() {
 
 		$models = $this->models;
@@ -108,10 +148,15 @@ class SetupController extends \Xpmse\Loader\Controller {
 			try { $inst->__clear(); } catch( Excp $e) {echo $e->toJSON(); return;}
 		}
 
+
+		// 移除配置项
 		try {
-			$option = new \Xpmse\Option('Xpmsns/Comment');
-			$option->unregister();
-		} catch ( Excp $e ) {}
+			$this->remove_option();
+		} catch( Excp $e ){
+			echo $e->toJSON(); return;
+		}
+
+
 
 		echo json_encode('ok');		
 	}

@@ -1,10 +1,10 @@
 <?php
 /**
- * XpmSE应用路由 
+ * 团队猫应用路由 
  * 
  * 所有请求将会通过本程序转发
  * 
- * @see XpmSE应用开发手册
+ * @see 团队猫应用开发手册
  */
 
 if( !defined('DS') ) define( 'DS' , DIRECTORY_SEPARATOR );
