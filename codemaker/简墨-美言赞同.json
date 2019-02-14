@@ -1,0 +1,473 @@
+{
+    "name": "简墨-美言赞同",
+    "data": {
+        "general": {
+            "app": "comment",
+            "org": "xpmsns",
+            "model": "_create",
+            "name": "agree",
+            "cname": "赞同"
+        },
+        "struct": {
+            "table": "agree",
+            "fields": [
+                {
+                    "name": "agree_id",
+                    "cname": "赞同ID",
+                    "type": "string",
+                    "length": "128",
+                    "default": "",
+                    "unique": "1",
+                    "index": "",
+                    "nullable": "",
+                    "json": "",
+                    "auto": "1",
+                    "file": "",
+                    "private": ""
+                },
+                {
+                    "name": "user_id",
+                    "cname": "用户ID",
+                    "type": "string",
+                    "length": "128",
+                    "default": "",
+                    "unique": "",
+                    "index": "1",
+                    "nullable": "",
+                    "json": "",
+                    "auto": "",
+                    "file": "",
+                    "private": ""
+                },
+                {
+                    "name": "outer_id",
+                    "cname": "资源ID",
+                    "type": "string",
+                    "length": "128",
+                    "default": "",
+                    "unique": "",
+                    "index": "1",
+                    "nullable": "",
+                    "json": "",
+                    "auto": "",
+                    "file": "",
+                    "private": ""
+                },
+                {
+                    "name": "origin",
+                    "cname": "来源",
+                    "type": "string",
+                    "length": "128",
+                    "default": "",
+                    "unique": "",
+                    "index": "1",
+                    "nullable": "",
+                    "json": "",
+                    "auto": "",
+                    "file": "",
+                    "private": ""
+                },
+                {
+                    "name": "url",
+                    "cname": "地址",
+                    "type": "string",
+                    "length": "600",
+                    "default": "",
+                    "unique": "",
+                    "index": "",
+                    "nullable": "",
+                    "json": "",
+                    "auto": "",
+                    "file": "",
+                    "private": ""
+                },
+                {
+                    "name": "origin_outer_id",
+                    "cname": "赞同唯一ID",
+                    "type": "string",
+                    "length": "128",
+                    "default": "",
+                    "unique": "1",
+                    "index": "",
+                    "nullable": "",
+                    "json": "",
+                    "auto": "",
+                    "file": "",
+                    "private": ""
+                },
+                {
+                    "name": "param",
+                    "cname": "参数",
+                    "type": "string",
+                    "length": "400",
+                    "default": "",
+                    "unique": "",
+                    "index": "",
+                    "nullable": "",
+                    "json": "1",
+                    "auto": "",
+                    "file": "",
+                    "private": ""
+                }
+            ],
+            "methods": [
+                {
+                    "name": "",
+                    "cname": "",
+                    "source": ""
+                }
+            ]
+        },
+        "links": {
+            "fields": [
+                {
+                    "cname": "用户",
+                    "type": "leftJoin",
+                    "model": "\\Xpmsns\\User\\Model\\User",
+                    "table": "user",
+                    "prefix": "xpmsns_user_",
+                    "field": "user_id",
+                    "on": "=",
+                    "name": "user_id",
+                    "alias": "user"
+                }
+            ]
+        },
+        "detail": {
+            "index": "name=agree_id",
+            "title": "name=agree_id",
+            "columns": [
+                {
+                    "cname": "用户ID",
+                    "name": "user_id",
+                    "type": "select-remote",
+                    "placeholder": "",
+                    "helper": "",
+                    "exp": "",
+                    "readonly": "",
+                    "attr": {
+                        "table": "user",
+                        "prefix": "xpmsns_user_",
+                        "model": "\\Xpmsns\\User\\Model\\User",
+                        "fields": [
+                            "user_id",
+                            "name",
+                            "nickname",
+                            "mobile"
+                        ],
+                        "option": "user_id",
+                        "selectedInline": "",
+                        "style": "{{name ? name : nickname}} ( ID: {{user_id}} 手机: {{mobile}} )",
+                        "default": "",
+                        "multiple": "",
+                        "api": "",
+                        "cancel": "",
+                        "cancelable": "1"
+                    },
+                    "validator": [
+                        {
+                            "method": "",
+                            "value": "",
+                            "message": ""
+                        }
+                    ]
+                },
+                {
+                    "cname": "资源ID",
+                    "name": "outer_id",
+                    "type": "input",
+                    "placeholder": "",
+                    "helper": "",
+                    "exp": "",
+                    "readonly": "",
+                    "attr": {
+                        "default": ""
+                    },
+                    "validator": [
+                        {
+                            "method": "",
+                            "value": "",
+                            "message": ""
+                        }
+                    ]
+                },
+                {
+                    "cname": "来源",
+                    "name": "origin",
+                    "type": "input",
+                    "placeholder": "",
+                    "helper": "",
+                    "exp": "",
+                    "readonly": "",
+                    "attr": {
+                        "default": ""
+                    },
+                    "validator": [
+                        {
+                            "method": "",
+                            "value": "",
+                            "message": ""
+                        }
+                    ]
+                },
+                {
+                    "cname": "地址",
+                    "name": "url",
+                    "type": "input",
+                    "placeholder": "",
+                    "helper": "",
+                    "exp": "",
+                    "readonly": "",
+                    "attr": {
+                        "default": ""
+                    },
+                    "validator": [
+                        {
+                            "method": "",
+                            "value": "",
+                            "message": ""
+                        }
+                    ]
+                },
+                {
+                    "cname": "参数",
+                    "name": "param",
+                    "type": "json-editor",
+                    "placeholder": "",
+                    "helper": "",
+                    "exp": "",
+                    "readonly": "",
+                    "attr": {
+                        "default": "",
+                        "mode": "",
+                        "rows": "",
+                        "autoheight": ""
+                    },
+                    "validator": [
+                        {
+                            "method": "",
+                            "value": "",
+                            "message": ""
+                        }
+                    ]
+                }
+            ],
+            "jscode": [
+                ""
+            ],
+            "undefined": [
+                "",
+                "",
+                "",
+                ""
+            ]
+        },
+        "list": {
+            "keyword_param": "keyword",
+            "keyword": [
+                "name=outer_id",
+                "name=origin",
+                "model=%5CXpmsns%5CUser%5CModel%5CUser&name=user_id&table=user&prefix=xpmsns_user_&alias=user&type=leftJoin",
+                "model=%5CXpmsns%5CUser%5CModel%5CUser&name=mobile_full&table=user&prefix=xpmsns_user_&alias=user&type=leftJoin",
+                "model=%5CXpmsns%5CUser%5CModel%5CUser&name=name&table=user&prefix=xpmsns_user_&alias=user&type=leftJoin",
+                "model=%5CXpmsns%5CUser%5CModel%5CUser&name=nickname&table=user&prefix=xpmsns_user_&alias=user&type=leftJoin"
+            ],
+            "jscode": [
+                ""
+            ],
+            "conditions": [
+                {
+                    "or": "0",
+                    "field": "name=agree_id",
+                    "type": "=",
+                    "cname": "",
+                    "param": "",
+                    "default": ""
+                },
+                {
+                    "or": "0",
+                    "field": "name=outer_id",
+                    "type": "=",
+                    "cname": "",
+                    "param": "",
+                    "default": ""
+                },
+                {
+                    "or": "0",
+                    "field": "model=%5CXpmsns%5CUser%5CModel%5CUser&name=user_id&table=user&prefix=xpmsns_user_&alias=user&type=leftJoin",
+                    "type": "=",
+                    "cname": "",
+                    "param": "",
+                    "default": ""
+                },
+                {
+                    "or": "0",
+                    "field": "model=%5CXpmsns%5CUser%5CModel%5CUser&name=mobile_full&table=user&prefix=xpmsns_user_&alias=user&type=leftJoin",
+                    "type": "like",
+                    "cname": "",
+                    "param": "",
+                    "default": ""
+                },
+                {
+                    "or": "0",
+                    "field": "name=origin",
+                    "type": "=",
+                    "cname": "",
+                    "param": "",
+                    "default": ""
+                },
+                {
+                    "or": "0",
+                    "field": "",
+                    "type": "like",
+                    "cname": "",
+                    "param": "",
+                    "default": ""
+                }
+            ],
+            "orderby": [
+                {
+                    "field": "name=created_at",
+                    "type": "desc",
+                    "cname": "创建时间倒序",
+                    "param": ""
+                },
+                {
+                    "field": "name=updated_at",
+                    "type": "desc",
+                    "cname": "更新时间倒序",
+                    "param": ""
+                }
+            ],
+            "statusby": [
+                {
+                    "name": "",
+                    "cname": "",
+                    "status": ""
+                }
+            ],
+            "columns": [
+                {
+                    "fields": [
+                        "name=agree_id"
+                    ],
+                    "cname": "赞同ID",
+                    "filter": "",
+                    "default": ""
+                },
+                {
+                    "fields": [
+                        "model=%5CXpmsns%5CUser%5CModel%5CUser&name=user_id&table=user&prefix=xpmsns_user_&alias=user&type=leftJoin",
+                        "model=%5CXpmsns%5CUser%5CModel%5CUser&name=name&table=user&prefix=xpmsns_user_&alias=user&type=leftJoin",
+                        "model=%5CXpmsns%5CUser%5CModel%5CUser&name=nickname&table=user&prefix=xpmsns_user_&alias=user&type=leftJoin",
+                        "model=%5CXpmsns%5CUser%5CModel%5CUser&name=mobile&table=user&prefix=xpmsns_user_&alias=user&type=leftJoin"
+                    ],
+                    "cname": "用户",
+                    "filter": "{{user_name ? user_name : user_nickname}} ( ID: {{user_user_id}} 手机: {{user_mobile}} )",
+                    "default": ""
+                },
+                {
+                    "fields": [
+                        "name=origin"
+                    ],
+                    "cname": "来源",
+                    "filter": "",
+                    "default": ""
+                },
+                {
+                    "fields": [
+                        "name=outer_id"
+                    ],
+                    "cname": "资源ID",
+                    "filter": "",
+                    "default": ""
+                },
+                {
+                    "fields": [
+                        "name=created_at",
+                        "name=updated_at"
+                    ],
+                    "cname": "更新时间",
+                    "filter": "{{updated_at ? updated_at : created_at}}",
+                    "default": ""
+                }
+            ]
+        },
+        "api": {
+            "createfields": "name=agree_id",
+            "searchfields": "name=agree_id",
+            "uploadparam": "",
+            "getfields": "",
+            "getstatus": "0",
+            "createstatus": "0",
+            "updatestatus": "0",
+            "deletestatus": "0",
+            "searchstatus": "0",
+            "uploadstatus": "0",
+            "getkey": [
+                "name=agree_id"
+            ],
+            "updatekey": [
+                "name=agree_id"
+            ],
+            "deletekey": [
+                "name=agree_id"
+            ],
+            "getauth": {
+                "sign": "",
+                "secret": "",
+                "image": ""
+            },
+            "createauth": {
+                "sign": "",
+                "secret": "",
+                "image": ""
+            },
+            "updateauth": {
+                "sign": "",
+                "secret": "",
+                "image": ""
+            },
+            "deleteauth": {
+                "sign": "",
+                "secret": "",
+                "image": ""
+            },
+            "searchauth": {
+                "sign": "",
+                "secret": "",
+                "image": ""
+            },
+            "uploadauth": {
+                "sign": "",
+                "secret": "1",
+                "image": ""
+            },
+            "methods": [
+                {
+                    "name": "",
+                    "cname": "",
+                    "source": ""
+                }
+            ]
+        }
+    },
+    "process": {
+        "general": "saved",
+        "struct": "saved",
+        "links": "saved",
+        "detail": "saved",
+        "list": "saved",
+        "api": "saved"
+    },
+    "next": null,
+    "prev": null,
+    "templete": {
+        "org": "xpmsns",
+        "name": "model",
+        "slug": "xpmsns_model",
+        "cname": "XpmSE 应用数据模型母版",
+        "version": "1.0.0",
+        "summary": "生成 XpmSE 应用数据模型。涵盖资源模型CURD、API CURD和标准资源管理界面。"
+    }
+}
