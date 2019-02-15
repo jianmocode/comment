@@ -77,7 +77,7 @@ class Agree extends Api {
     function remove($query, $data ) {
 
 
-        if (empty($data["agree_id"])){
+        if (empty($data["agree_id"]) && (empty($data["origin"]) && empty($data["outer_id"])) ){
             throw new Excp("未指定赞同记录", 402, ["query"=>$query, "data"=>$data]);
         }
 
@@ -92,13 +92,22 @@ class Agree extends Api {
         $time = time();
         $inst = new \Xpmsns\Comment\Model\Agree;
         $agree_id = $data["agree_id"];
+        $origin_outer_id = "{$data["origin"]}_{$user_id}_{$data["outer_id"]}";
 
-        $agree = $inst->getByAgreeId($agree_id);
+        if ( !empty($agree_id) ) {
+            $agree = $inst->getByAgreeId($agree_id);
+        } else {
+            $agree = $inst->getByOriginOuterId($origin_outer_id);
+        }
         if ( $agree["user_id"] != $user_id ) {
             throw new Excp("您没有该赞同的删除权限", 403, ["user_id"=>$user_id, "data"=>$data]);
         }
 
-       $resp = $inst->remove($agree_id, "agree_id");
+        if ( !empty($agree_id) ) {
+            $resp = $inst->remove($agree_id, "agree_id");
+        } else {
+            $resp = $inst->remove($origin_outer_id, "origin_outer_id");
+        }
 
        if ( $resp == true ) {
            return ["code"=>0, "message"=>"移除赞同成功"];
