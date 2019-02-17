@@ -98,6 +98,33 @@ class Agree extends Model {
         }
     }
 
+     /**
+     * 读取一组资源计数
+     * @param array $outer_id 资源ID数组
+     * @param string $origin 来源
+     */
+    static public function counts( $outer_ids, $origin ) {
+        $response = [];
+        foreach( $outer_ids as $outer_id ) {
+            $response[$outer_id] = self::updateCnt( $outer_id, $origin );
+        }
+        return $response;
+    }
+
+    /**
+     * 读取资源计数
+     * @param string $outer_id 资源ID
+     * @param string $origin 来源
+     */
+    static public function count( $outer_id, $origin ) { 
+
+        return (new self())->query()
+                    ->where("origin", "=", $origin)
+                    ->where("outer_id", "=", $outer_id)
+                    ->count()
+                ;
+    }
+
 
     /**
      * 赞同初始化( 注册行为/注册任务/设置默认值等... )
