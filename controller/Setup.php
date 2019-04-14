@@ -14,6 +14,7 @@ class SetupController extends \Xpmse\Loader\Controller {
 
 		$this->models = [
             '\\Xpmsns\\Comment\\Model\\Agree',
+            '\\Xpmsns\\Comment\\Model\\Comment',
 		];
 	}
 
