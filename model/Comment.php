@@ -4,7 +4,7 @@
  * 评论数据模型
  *
  * 程序作者: XpmSE机器人
- * 最后修改: 2019-04-14 17:23:26
+ * 最后修改: 2019-04-14 17:27:38
  * 程序母版: /data/stor/private/templates/xpmsns/model/code/model/Name.php
  */
 namespace Xpmsns\Comment\Model;
@@ -418,7 +418,7 @@ class Comment extends Model {
 	 * @param array   $select       选取字段，默认选取所有
 	 * @return array 评论记录MAP {"comment_id1":{"key":"value",...}...}
 	 */
-	public function getInByCommentId($comment_ids, $select=["comment.comment_id","comment.user_id","user.name","user.nickname","user.mobile","comment.content","comment.status"], $order=["comment.created_at"=>"asc"] ) {
+	public function getInByCommentId($comment_ids, $select=["comment.comment_id","comment.user_id","user.name","user.nickname","user.mobile","comment.content","comment.status","comment.created_at"], $order=["comment.created_at"=>"asc"] ) {
 		
 		if ( is_string($select) ) {
 			$select = explode(',', $select);
@@ -511,7 +511,7 @@ class Comment extends Model {
 	 * @param array   $order   排序方式 ["field"=>"asc", "field2"=>"desc"...]
 	 * @return array 评论记录数组 [{"key":"value",...}...]
 	 */
-	public function top( $limit=100, $select=["comment.comment_id","comment.user_id","user.name","user.nickname","user.mobile","comment.content","comment.status"], $order=["comment.created_at"=>"asc"] ) {
+	public function top( $limit=100, $select=["comment.comment_id","comment.user_id","user.name","user.nickname","user.mobile","comment.content","comment.status","comment.created_at"], $order=["comment.created_at"=>"asc"] ) {
 
 		if ( is_string($select) ) {
 			$select = explode(',', $select);
@@ -549,7 +549,7 @@ class Comment extends Model {
 	/**
 	 * 按条件检索评论记录
 	 * @param  array  $query
-	 *         	      $query['select'] 选取字段，默认选择 ["comment.comment_id","comment.user_id","user.name","user.nickname","user.mobile","comment.content","comment.status"]
+	 *         	      $query['select'] 选取字段，默认选择 ["comment.comment_id","comment.user_id","user.name","user.nickname","user.mobile","comment.content","comment.status","comment.created_at"]
 	 *         	      $query['page'] 页码，默认为 1
 	 *         	      $query['perpage'] 每页显示记录数，默认为 20
 	 *			      $query["keywords"] 按关键词查询
@@ -697,7 +697,7 @@ class Comment extends Model {
 	 */
 	public function search( $query = [] ) {
 
-		$select = empty($query['select']) ? ["comment.comment_id","comment.user_id","user.name","user.nickname","user.mobile","comment.content","comment.status"] : $query['select'];
+		$select = empty($query['select']) ? ["comment.comment_id","comment.user_id","user.name","user.nickname","user.mobile","comment.content","comment.status","comment.created_at"] : $query['select'];
 		if ( is_string($select) ) {
 			$select = explode(',', $select);
 		}

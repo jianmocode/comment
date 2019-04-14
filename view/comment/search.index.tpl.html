@@ -164,6 +164,7 @@ use \Xpmse\T;
 								<th class="font-w300"> 用户 </th>
 								<th class="font-w300"> 正文 </th>
 								<th class="font-w300"> 状态 </th>
+								<th class="font-w300"> 创建时间 </th>
 							</tr>
 						</thead>
 
@@ -175,7 +176,7 @@ use \Xpmse\T;
 									<?php $v=null; $v=T::s("{{comment_id}}", $rs ); echo empty($v) ? T::s("", $rs ) : $v; ?>
 								</td>
 								<td class="font-w300">
-									<?php $v=null; $v=T::s("{{user_name ? user_name : user_nickname}} ( 手机: {{user_mobile}} ID: {{user_user_id}})", $rs ); echo empty($v) ? T::s("", $rs ) : $v; ?>
+									<?php $v=null; $v=T::s("{{user_name ? user_name : user_nickname}} ( 手机: {{user_mobile}} ID: {{user_id}})", $rs ); echo empty($v) ? T::s("", $rs ) : $v; ?>
 								</td>
 								<td class="font-w300">
 									<?php $v=null; $v=T::s("{{content}}", $rs ); echo empty($v) ? T::s("", $rs ) : $v; ?>
@@ -183,13 +184,16 @@ use \Xpmse\T;
 								<td class="font-w300">
 									<span class="text-<?=$rs['_status']['style']?>"><?=$rs['_status']['name'] ? $rs['_status']['name']  : $rs['status'] ?></span>
 								</td>
+								<td class="font-w300">
+									<?php $v=null; $v=T::s("{{created_at}}", $rs ); echo empty($v) ? T::s("", $rs ) : $v; ?>
+								</td>
 							</tr>
 							<?php endforeach;?>
 
 						</tbody>
 
 						<tfoot>
-							<tr><td colspan="4"> <nav class="pull-right">
+							<tr><td colspan="5"> <nav class="pull-right">
 
 								<ul class="pagination">
 									<?php if ($response['prev'] !== false): ?>
