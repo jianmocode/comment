@@ -16,6 +16,7 @@ use \Xpmse\Conf;
 use \Mina\Cache\Redis as Cache;
 use \Xpmse\Loader\App as App;
 use \Xpmse\Job;
+use \Xpmse\Content;
 
 
 class Comment extends Model {
@@ -52,6 +53,122 @@ class Comment extends Model {
 	/**
 	 * 自定义函数 
 	 */
+
+    // @KEEP BEGIN
+
+    /**
+     * 评论初始化( 注册行为/注册任务/设置默认值等... )
+     */
+    public function __defaults() {
+
+        // 注册配置项
+        $options = [
+            [
+                "name"=>"评论配置", 
+				"key"=>"comment", 
+				"default"=>[
+                    "status" => "pending",
+                    "display" => ["enabled"],
+                    "limits" => [ 
+                        "interval" => 60,
+                        "hour" => 30,
+                    ],
+				],
+				"order"=> 90
+            ]
+        ];
+
+        $opt = new \Xpmse\Option('xpmsns/comment');
+        foreach( $options as $o ) {
+            try {
+                $opt->register(
+                    $o["name"], 
+                    $o["key"], 
+                    $o["default"], 
+                    $o["order"]
+                );
+            } catch( Excp $e ){  $e->log(); }
+        }
+    }
+
+
+    /**
+     * 读取评论配置
+     */
+    public function getOption() {
+
+        $opt = new \Xpmse\Option('xpmsns/comment');
+        $option = $opt->get("comment");
+        if ( $option === false || !is_array($option)) {
+            $option = [
+                "status" => "pending",
+                "display" => ["enabled"],
+                "limits" =>  [ 
+                    "interval" => 60,
+                    "hour" => 30,
+                ],
+            ];
+        }
+        return $option;
+    }
+
+
+    /**
+     * 校验发表配额
+     * @param string $user_id 用户ID
+     * @param array $limits 配置设置
+     */
+    public function checkLimit( $user_id, $limits = [] ) {
+
+        if ( empty($limits) ) {
+            $limits =  [ 
+                "interval" => 60,
+                "hour" => 30,
+            ];
+        }
+        // 检查发送间隔
+        $rows = $this->query()
+                    ->where("user_id", "=", $user_id )
+                    ->orderBy("created_at", "desc")
+                    ->limit(1)
+                    ->select(["created_at"])
+                    ->get()
+                    ->toArray()
+                ;
+        if ( empty($rows) ) {
+            return true;
+        }
+
+
+        $row = current( $rows );
+        $time = strtotime( $row["created_at"]);
+        $now = time();
+        if ( intval($now - $time) < $limits["interval"] ) {
+            throw new Excp("操作过快，两次发表间隔时长{$limits["interval"]}秒", 400, [
+                "fields" => ["interval"],
+                "messages" => ["interval"=>"操作过快，两次发表间隔时长{$limits["interval"]}秒"]            
+            ]);
+        }
+
+        // 检查小时限额
+        $cnt = $this->query()
+                    ->where("user_id", "=", $user_id )
+                    ->orderBy("created_at", "desc")
+                    ->where("created_at", '>', date('Y-m-d H:i:s', $now-3600) )
+                    ->count(["comment_id"])
+                ;
+        if ( $cnt >= $limits["hour"] ) {
+            throw new Excp("每小时最多发布{$limits["hour"]}条评论", 400, [
+                "fields" => ["hour"],
+                "messages" => ["hour"=>"每小时最多发布{$limits["hour"]}条评论"]
+            ]);
+        }
+    
+        return true;
+    }
+
+
+    // @KEEP END
 
 
 	/**
@@ -365,9 +482,25 @@ class Comment extends Model {
 	 * @return array 数据记录数组 (key:value 结构)
 	 */
 	function create( $data ) {
+
 		if ( empty($data["comment_id"]) ) { 
 			$data["comment_id"] = $this->genId();
-		}
+        }
+        
+        // @KEEP BEGIN
+        // 解析 Content 
+        if ( !empty($data["content"]) ) {
+            $content = new Content();
+            $content->loadContent( $data["content"] );
+
+            // 解析内容
+            $data["desktop"] = $content->html();
+            $data["mobile"] = $content->mobile();
+            $data["wxapp"] = $content->wxapp();
+            $data["app"] = $content->app();
+        }
+        // @KEEP END
+
 		return parent::create( $data );
 	}
 
