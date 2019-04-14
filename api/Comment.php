@@ -121,17 +121,7 @@ class Comment extends Api {
 
         $result = $comment->search( $params );
         $comment->withReplies( $result["data"] );
-
         return $result;
-        
-    }
-
-
-    /**
-     * 查询评论数量
-     */
-    protected function count( $params, $payload ) {
-
     }
 
     // @KEEP END

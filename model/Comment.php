@@ -169,6 +169,7 @@ class Comment extends Model {
 
     /**
      * 读取回复数据
+     * @param array $rows 评论数据引用
      */
     public function withReplies( & $rows ) {
 
@@ -206,6 +207,34 @@ class Comment extends Model {
         }
 
     }
+
+    /**
+     * 查询资源评论数量
+     */
+    public function withCounts( & $rows ) {
+        $outer_ids = array_column( $rows, "outer_id");
+        if ( empty($outer_ids) ) {
+            return;
+        }
+
+        $counts = $this->query()
+                ->whereIn("outer_id", $outer_ids )
+                ->groupBy("outer_id")
+                ->select("outer_id")
+                ->selectRaw("Count(comment_id) as cnt")
+                ->get()
+                ->toArray()
+            ;
+        $map = array_combine(array_column($counts, 'outer_id'), $counts);
+
+        foreach( $rows as & $row ) {
+            $row["comment_cnt"] = 0;
+            if ( is_array($map["{$row["outer_id"]}"]) ) {
+                $row["comment_cnt"] = $map["{$row["outer_id"]}"]["cnt"];
+            }
+        }
+    }
+
     // @KEEP END
 
 
