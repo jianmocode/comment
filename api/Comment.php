@@ -107,9 +107,23 @@ class Comment extends Api {
 
         $comment = new \Xpmsns\Comment\Model\Comment();
 
-        $result = $comment->search( $params );
-        return $result;
+        if( empty($params["select"]) ) {
+            $params["select"] = [
+                "comment.comment_id","comment.outer_id","user.mobile","comment.desktop","comment.mobile","comment.wxapp","comment.app","comment.status","comment.created_at","comment.updated_at",
+                "comment.user_id","user.name","user.nickname",
+                "comment.reply_id",
+            ];
+        }
 
+        if ( empty($params["order"]) ) {
+            $params["orderby_created_at_desc"] = 1;
+        }
+
+        $result = $comment->search( $params );
+        $comment->withReplies( $result["data"] );
+
+        return $result;
+        
     }
 
 

@@ -167,6 +167,45 @@ class Comment extends Model {
     }
 
 
+    /**
+     * 读取回复数据
+     */
+    public function withReplies( & $rows ) {
+
+        $comment_ids = array_column( $rows, "comment_id");
+        if ( empty($comment_ids) ) {
+            return;
+        }
+
+        $qb = Utils::getTab("xpmsns_comment_comment as comment", "{none}")->query();
+        
+
+        $qb->leftJoin("xpmsns_user_user as user", "user.user_id", "=", "comment.user_id"); // 连接用户
+        $select = [
+            "comment.comment_id","comment.outer_id","user.mobile","comment.desktop","comment.mobile","comment.wxapp","comment.app","comment.status","comment.created_at","comment.updated_at",
+            "comment.user_id","user.name","user.nickname",
+            "comment.reply_id",
+        ];
+        $replies = $qb->whereIn("reply_id", $comment_ids)
+                    ->select($select)
+                    ->orderBy("created_at", "desc")
+                    ->get()
+                    ->toArray()
+                ;
+        $map = [];
+        foreach( $replies as $reply ) {
+            $reply_id = $reply["reply_id"];
+            $map[$reply_id][] = $reply;
+        }
+
+        foreach( $rows as & $row ) {
+            $row["replies"] = [];
+            if ( is_array($map["{$row["comment_id"]}"]) ) {
+                $row["replies"] = $map["{$row["comment_id"]}"];
+            }
+        }
+
+    }
     // @KEEP END
 
 
