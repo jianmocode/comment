@@ -4,7 +4,7 @@
  * 评论数据接口 
  *
  * 程序作者: XpmSE机器人
- * 最后修改: 2019-04-13 17:17:55
+ * 最后修改: 2019-04-14 17:23:24
  * 程序母版: /data/stor/private/templates/xpmsns/model/code/api/Name.php
  */
 namespace Xpmsns\Comment\Api;
@@ -99,6 +99,16 @@ class Comment extends Api {
      * 查询评论
      */
     protected function query( $params, $payload  ) {
+        
+        $user = $this->getUser();
+        $user_id = $user["user_id"];
+
+        $params["reply_id"] = null;
+
+        $comment = new \Xpmsns\Comment\Model\Comment();
+
+        $result = $comment->search( $params );
+        return $result;
 
     }
 

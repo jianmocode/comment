@@ -4,7 +4,7 @@
  * 评论数据模型
  *
  * 程序作者: XpmSE机器人
- * 最后修改: 2019-04-13 17:17:56
+ * 最后修改: 2019-04-14 17:23:26
  * 程序母版: /data/stor/private/templates/xpmsns/model/code/model/Name.php
  */
 namespace Xpmsns\Comment\Model;
@@ -16,7 +16,6 @@ use \Xpmse\Conf;
 use \Mina\Cache\Redis as Cache;
 use \Xpmse\Loader\App as App;
 use \Xpmse\Job;
-use \Xpmse\Content;
 
 
 class Comment extends Model {
