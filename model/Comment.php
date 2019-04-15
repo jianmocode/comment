@@ -16,6 +16,7 @@ use \Xpmse\Conf;
 use \Mina\Cache\Redis as Cache;
 use \Xpmse\Loader\App as App;
 use \Xpmse\Job;
+use \Xpmse\Content;
 
 
 class Comment extends Model {
