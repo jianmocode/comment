@@ -185,7 +185,7 @@ class Comment extends Model {
         $qb->leftJoin("xpmsns_user_user as user", "user.user_id", "=", "comment.user_id"); // 连接用户
         $select = [
             "comment.comment_id","comment.outer_id","user.mobile","comment.desktop","comment.mobile","comment.wxapp","comment.app","comment.status","comment.created_at","comment.updated_at",
-            "comment.user_id","user.name","user.nickname",
+            "comment.user_id","user.name","user.nickname","user.headimgurl",
             "comment.reply_id",
         ];
         $replies = $qb->whereIn("reply_id", $comment_ids)
@@ -196,6 +196,7 @@ class Comment extends Model {
                 ;
         $map = [];
         foreach( $replies as $reply ) {
+            $this->format( $reply );
             $reply_id = $reply["reply_id"];
             $map[$reply_id][] = $reply;
         }
