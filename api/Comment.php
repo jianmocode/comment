@@ -122,7 +122,9 @@ class Comment extends Api {
         }
 
         $result = $comment->search( $params );
-        $comment->withReplies( $result["data"] );
+        $page = $params["reply_page"] ? intval($params["reply_page"]) : 1;
+        $perpage = $params["reply_perpage"] ? intval($params["reply_perpage"]) : 1;
+        $comment->withReplies( $result["data"], ["page"=>$page, "perpage"=>$perpage] );
         return $result;
     }
 

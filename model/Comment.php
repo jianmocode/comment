@@ -172,7 +172,7 @@ class Comment extends Model {
      * 读取回复数据
      * @param array $rows 评论数据引用
      */
-    public function withReplies( & $rows ) {
+    public function withReplies( & $rows, $query=[] ) {
 
         $comment_ids = array_column( $rows, "comment_id");
         if ( empty($comment_ids) ) {
@@ -188,12 +188,17 @@ class Comment extends Model {
             "comment.user_id","user.name","user.nickname","user.headimgurl",
             "comment.reply_id",
         ];
-        $replies = $qb->whereIn("reply_id", $comment_ids)
+
+        // 页码
+		$page = array_key_exists('page', $query) ?  intval( $query['page']) : 1;
+		$perpage = array_key_exists('perpage', $query) ?  intval( $query['perpage']) : 20;
+
+        $result = $qb->whereIn("reply_id", $comment_ids)
                     ->select($select)
                     ->orderBy("created_at", "desc")
-                    ->get()
-                    ->toArray()
+                    ->pgArray($perpage, ['comment._id'], 'page', $page)
                 ;
+        $replies = $result["data"];
         $map = [];
         foreach( $replies as $reply ) {
             $this->format( $reply );
