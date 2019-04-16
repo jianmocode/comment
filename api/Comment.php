@@ -103,7 +103,9 @@ class Comment extends Api {
         $user = $this->getUser();
         $user_id = $user["user_id"];
 
-        $params["reply_id"] = null;
+        if ( !array_key_exists("reply_id", $params) ) {
+            $params["reply_id"] = null;
+        }
 
         $comment = new \Xpmsns\Comment\Model\Comment();
 
