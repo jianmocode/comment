@@ -110,7 +110,7 @@ class Comment extends Api {
         if( empty($params["select"]) ) {
             $params["select"] = [
                 "comment.comment_id","comment.outer_id","user.mobile","comment.desktop","comment.mobile","comment.wxapp","comment.app","comment.status","comment.created_at","comment.updated_at",
-                "comment.user_id","user.name","user.nickname",
+                "comment.user_id","user.name","user.nickname","user.headimgurl",
                 "comment.reply_id",
             ];
         }

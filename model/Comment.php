@@ -279,7 +279,15 @@ class Comment extends Model {
 	 */
 	public function format( & $rs ) {
      
-		$fileFields = []; 
+        $fileFields = []; 
+        
+        // @KEEP BEGIN
+        // 处理用户头像
+        $fileFields = ["user_headimgurl"];
+        if ( array_key_exists('user_headimgurl', $rs ) && !empty($rs['user_headimgurl'])  && is_string($rs['user_headimgurl']) ) {
+            $rs["user_headimgurl"] = json_decode( $rs["user_headimgurl"], true );
+        }
+        // @KEEP END
 
         // 处理图片和文件字段 
         $this->__fileFields( $rs, $fileFields );
