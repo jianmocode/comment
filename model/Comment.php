@@ -207,6 +207,10 @@ class Comment extends Model {
             }
         }
 
+        if ( count($row["replies"]) > 3 || count($row["replies"]) == 0 ) {
+            $row["replies"] = null;
+        }
+
     }
 
     /**
