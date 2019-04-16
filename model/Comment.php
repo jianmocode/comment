@@ -824,6 +824,11 @@ class Comment extends Model {
 		// 按回复评论ID查询 (=)  
 		if ( array_key_exists("reply_id", $query) &&!empty($query['reply_id']) ) {
 			$qb->where("comment.reply_id", '=', "{$query['reply_id']}" );
+        }
+        
+        // 按回复评论ID查询 (=)  
+		if ( array_key_exists("reply_id", $query) &&empty($query['reply_id']) ) {
+			$qb->whereNull("comment.reply_id");
 		}
 		  
 		// 按回复用户ID查询 (=)  
