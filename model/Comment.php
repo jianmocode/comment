@@ -216,7 +216,7 @@ class Comment extends Model {
             $mapcnt[$reply_id] = $cnt["cnt"];
         }
 
-        print_r( $mapcnt );
+        // print_r( $mapcnt );
         
         // Merge data
         foreach( $rows as & $row ) {
