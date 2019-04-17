@@ -215,14 +215,18 @@ class Comment extends Model {
             $reply_id = $cnt["reply_id"];
             $mapcnt[$reply_id] = $cnt["cnt"];
         }
+
+        print_r( $mapcnt );
         
         // Merge data
         foreach( $rows as & $row ) {
             $row["replies"] = [];
             $row["replies_cnt"] = 0;
             if ( is_array($map["{$row["comment_id"]}"]) ) {
-                $row["replies_cnt"] = $mapcnt[$reply_id];
                 $row["replies"] = $map["{$row["comment_id"]}"];
+            }
+            if ( $mapcnt["{$row["comment_id"]}"] !== null ) {
+                $row["replies_cnt"] = $mapcnt["{$row["comment_id"]}"];
             }
         }
 
