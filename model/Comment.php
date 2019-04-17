@@ -180,8 +180,6 @@ class Comment extends Model {
         }
 
         $qb = Utils::getTab("xpmsns_comment_comment as comment", "{none}")->query();
-        
-
         $qb->leftJoin("xpmsns_user_user as user", "user.user_id", "=", "comment.user_id"); // 连接用户
         $select = [
             "comment.comment_id","comment.outer_id","user.mobile","comment.desktop","comment.mobile","comment.wxapp","comment.app","comment.status","comment.created_at","comment.updated_at",
@@ -199,16 +197,31 @@ class Comment extends Model {
                     ->pgArray($perpage, ['comment._id'], 'page', $page)
                 ;
         $replies = $result["data"];
-        $map = [];
+        $map = []; $mapcnt = [];
         foreach( $replies as $reply ) {
             $this->format( $reply );
             $reply_id = $reply["reply_id"];
             $map[$reply_id][] = $reply;
         }
 
+        // Query Totals
+        $qb = Utils::getTab("xpmsns_comment_comment as comment", "{none}")->query();
+        $counts = $qb->whereIn("reply_id", $comment_ids)
+                    ->select("reply_id")
+                    ->selectRaw("Count(comment_id) as cnt")
+                    ->groupBy("reply_id")
+                    ->get()->toArray();
+        foreach( $counts as $cnt ) {
+            $reply_id = $cnt["reply_id"];
+            $mapcnt[$reply_id] = $cnt["cnt"];
+        }
+        
+        // Merge data
         foreach( $rows as & $row ) {
             $row["replies"] = [];
+            $row["replies_cnt"] = 0;
             if ( is_array($map["{$row["comment_id"]}"]) ) {
+                $row["replies_cnt"] = $mapcnt[$reply_id];
                 $row["replies"] = $map["{$row["comment_id"]}"];
             }
         }
