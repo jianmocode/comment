@@ -100,7 +100,7 @@ class Comment extends Api {
      */
     protected function query( $params, $payload  ) {
         
-        $user = $this->getUser();
+        $user = \Xpmsns\User\Model\User::Info();
         $user_id = $user["user_id"];
 
         if ( !array_key_exists("reply_id", $params) ) {
